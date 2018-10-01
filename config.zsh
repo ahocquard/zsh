@@ -11,27 +11,27 @@ setopt rm_star_silent
 
 
 # Common alias 
-alias xdebug_stop="mv /usr/local/etc/php/7.1/conf.d/ext-xdebug.ini /usr/local/etc/php/7.1/conf.d/ext-xdebug.ini.deactivated"
-alias xdebug_start="mv /usr/local/etc/php/7.1/conf.d/ext-xdebug.ini.deactivated /usr/local/etc/php/7.1/conf.d/ext-xdebug.ini"
-alias composer="php -d memory_limit=-1 /usr/local/bin/composer "
+alias xdebug_stop="dce fpm sudo phpdismod xdebug"
+alias xdebug_start="dce fpm sudo phpenmod xdebug"
+alias dcef="xdebug_stop; dce fpm"
+alias xdcef="xdebug_start; dce fpm"
+alias dcomposer="dcef php -d memory_limit=-1 /usr/local/bin/composer "
 
 alias slow_query_start="echo \"SET GLOBAL slow_query_log = 'ON';\" | mysql -u root -p"
 alias slow_query_stop="echo \"SET GLOBAL slow_query_log = 'OFF';\" | mysql -u root -p"
 
 # Akeneo alias
-alias b="xdebug_stop 2>/dev/null; vendor/bin/behat"
-alias xb="xdebug_start 2>/dev/null; vendor/bin/behat"
-alias s="xdebug_stop 2>/dev/null; vendor/bin/phpspec run"
-alias xs="xdebug_start 2>/dev/null; vendor/bin/phpspec run"
-alias ac="app/console"
-alias bc="bin/console"
+alias b="dcef vendor/bin/behat"
+alias xb="xdcef vendor/bin/behat"
+alias s="dcef vendor/bin/phpspec run"
+alias xs="xdcef vendor/bin/phpspec run"
+alias bc="dcef bin/console"
+alias xbc="xdcef fpm bin/console"
 alias cc="rm -rf ./var/cache/*"
-alias sel="nohup java -jar /Users/ahocquard/Workspace/akeneo/selenium/selenium-server-standalone-2.53.1.jar >/dev/null 2>&1 &"
-alias mongo_start="nohup mongod >/dev/null 2>&1 &"
-alias ca="rm -Rf ./var/cache/* ./web/bundles/* ./web/css/* ./web/js/*; bc pim:install:ass --symlink -e=prod; yarn run webpack"
-alias jed='bin/console akeneo:batch:job-queue-consumer-daemon --env=prod'
-alias jedo='bin/console akeneo:batch:job-queue-consumer-daemon --env=prod --run-once'
-alias jedk='pkill -f job-queue-consumer-daemon'
+alias jed='dcef bin/console akeneo:batch:job-queue-consumer-daemon --env=prod'
+alias jedo='dcef bin/console akeneo:batch:job-queue-consumer-daemon --env=prod --run-once'
+alias xjedo='xdcef bin/console akeneo:batch:job-queue-consumer-daemon --env=prod --run-once'
+alias jedk='dcef pkill -f job-queue-consumer-daemon'
 
 phpunitWithFilter() {
     if [[ "$#" == 2 ]]; then
@@ -43,11 +43,11 @@ phpunitWithFilter() {
     fi
 
     if [[ "$1" == "true" ]]; then
-        xdebug_start 2>/dev/null
+        xdebug_start
     else
-        xdebug_stop 2>/dev/null
+        xdebug_stop
     fi
-    vendor/bin/phpunit -c app/phpunit.xml --filter "$PHPUNIT_TEST_NAME" "$PHPUNIT_INTEGRATION_FILE"
+    dce fpm vendor/bin/phpunit -c app/phpunit.xml --filter "$PHPUNIT_TEST_NAME" "$PHPUNIT_INTEGRATION_FILE"
 }
 alias pf="phpunitWithFilter false"
 alias xpf="phpunitWithFilter true"
@@ -59,11 +59,11 @@ phpunit() {
     fi
 
     if [[ "$1" == "true" ]]; then
-        xdebug_start 2>/dev/null
+        xdebug_start
     else
-        xdebug_stop 2>/dev/null
+        xdebug_stop
     fi
-    vendor/bin/phpunit --debug -c app/phpunit.xml  "$PHPUNIT_INTEGRATION_FILE"
+    dce fpm vendor/bin/phpunit --debug -c app/phpunit.xml  "$PHPUNIT_INTEGRATION_FILE"
 }
 alias p="phpunit false"
 alias xp="phpunit true"
